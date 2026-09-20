@@ -1,0 +1,18 @@
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+
+# Phase 01+
+sqlalchemy
+psycopg[binary]
+
+# Phase 02+
+python-jose[cryptography]
+passlib[bcrypt]
+
+# Testing / quality
+pytest
+httpx
+ruff
+mypy

@@ -1,0 +1,25 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: minecore-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: minecore
+      POSTGRES_USER: minecore
+      POSTGRES_PASSWORD: minecore
+
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - minecore_postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U minecore -d minecore"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  minecore_postgres_data:
