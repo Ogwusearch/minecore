@@ -64,7 +64,7 @@ load_env_file(ENV_FILE)
 # ---------------------------------------------------------------------------
 DEFAULT_DATABASE_URL = "postgresql+psycopg://minecore:minecore@localhost:5433/minecore"
 
-DATABASE_URL = os.environ.get("DATABASE_URL", DEFAULT_DATABASE_URL)
+DATABASE_URL = os.environ.get("DATABASE_URL_SYNC", DEFAULT_DATABASE_URL.replace("+psycopg", ""))
 
 # psycopg.connect() does not understand SQLAlchemy driver suffixes
 PSYCOPG_URL = DATABASE_URL.replace("postgresql+psycopg://", "postgresql://")

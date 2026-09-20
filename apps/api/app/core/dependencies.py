@@ -21,3 +21,22 @@ async def current_organization_id(
             detail="Missing X-Organization-Id header",
         )
     return x_organization_id
+
+
+async def current_user_id(
+    x_user_id: UUID | None = Header(default=None, alias="X-User-Id"),
+) -> UUID:
+    """Placeholder user dependency for Phase 05.
+
+    The audit trail records an actor for every change. Until Phase 02's
+    JWT authentication is wired through, this reads the user id from an
+    `X-User-Id` header (mirrors the `X-Organization-Id` placeholder used
+    by Phase 04). When the JWT dependency lands, replace the body with
+    the token decoder — the signature stays the same.
+    """
+    if x_user_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing authentication",
+        )
+    return x_user_id

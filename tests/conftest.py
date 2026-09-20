@@ -21,6 +21,14 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 
+def _sa_url(url: str) -> str:
+    """Force SQLAlchemy to use psycopg3, matching app.db.database._sa_url."""
+    if url.startswith("postgresql://"):
+        return "postgresql+psycopg://" + url[len("postgresql://"):]
+    return url
+
+
+
 ROOT = Path(__file__).resolve().parent.parent
 ENV_FILE = ROOT / ".env"
 
@@ -43,7 +51,7 @@ _load_env_file(ENV_FILE)
 
 
 DEFAULT_DATABASE_URL = "postgresql+psycopg://minecore:minecore@localhost:5433/minecore"
-DATABASE_URL = os.environ.get("DATABASE_URL", DEFAULT_DATABASE_URL)
+DATABASE_URL = os.environ.get("DATABASE_URL_SYNC", DEFAULT_DATABASE_URL.replace("+psycopg", ""))
 
 
 @pytest.fixture(scope="session")
@@ -69,7 +77,7 @@ def db(database_url: str):
 # ---------------------------------------------------------------------------
 @pytest.fixture(scope="session")
 def engine(database_url: str):
-    eng = create_engine(database_url, future=True)
+    eng = create_engine(_sa_url(database_url), future=True)
     yield eng
     eng.dispose()
 

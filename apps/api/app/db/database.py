@@ -2,6 +2,12 @@
 
 DDL is owned by database/migrations/*.sql. This module only provides
 the runtime ORM plumbing.
+
+The project venv ships psycopg3, not psycopg2. SQLAlchemy's default
+driver for a bare `postgresql://` URL is psycopg2, so we rewrite the
+scheme to `postgresql+psycopg://` before handing it to create_engine.
+The rewrite happens here and only here, so `.env` can keep a single
+plain URL that every component (raw psycopg, SQLAlchemy) understands.
 """
 from __future__ import annotations
 
@@ -11,8 +17,15 @@ from sqlalchemy.orm import DeclarativeBase, sessionmaker
 from app.core.config import settings
 
 
+def _sa_url(url: str) -> str:
+    """Force the psycopg3 driver for SQLAlchemy."""
+    if url.startswith("postgresql://"):
+        return "postgresql+psycopg://" + url[len("postgresql://"):]
+    return url
+
+
 engine = create_engine(
-    settings.database_url,
+    _sa_url(settings.database_url),
     pool_pre_ping=True,
     future=True,
 )
